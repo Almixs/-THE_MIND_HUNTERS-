@@ -2,6 +2,7 @@ from collections import UserDict
 from datetime import datetime, timedelta
 import re
 import pickle
+import os
 
 
 
@@ -260,17 +261,18 @@ class Record:
 
 
 class AddressBook(UserDict):
+    filepath = os.path.expanduser("~\Documents")
 
     def add_record(self, record: Record) -> None:
         self.data[record.name.value] = record
         self.save_adress_book_to_file()
-
-    def save_adress_book_to_file(self, filename="AddressBook.bin"):
+    
+    def save_adress_book_to_file(self, filename=f"{filepath}\AddressBook.bin"):
         with open(filename, "wb") as fh:
             pickle.dump(self.data, fh) 
 
     @classmethod
-    def read_adress_book_from_file(cls, filename="AddressBook.bin"):
+    def read_adress_book_from_file(cls, filename=f"{filepath}\AddressBook.bin"):
         try:
             with open(filename, "rb") as fh:
                 load_dict = pickle.load(fh)
