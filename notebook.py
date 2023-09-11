@@ -6,7 +6,7 @@ import pickle
 class Field:
 
     def __init__(self, value):
-        self
+        self.__value = None
         self.value = value
 
     def __str__(self):
@@ -14,6 +14,14 @@ class Field:
 
     def __repr__(self):
         return self.value
+
+    @property
+    def value(self):
+        return self.__value
+
+    @value.setter
+    def value(self, value):
+        self.__value = value
 
 
 class Title(Field):
@@ -35,6 +43,11 @@ class Record:
         self.tag = [tag]
         self.note = [{"note": str(note), "tag": self.tag}]
 
+    def __str__(self) -> str:
+
+        all_notes = [x['note'] for x in self.note]
+        return f'Title: {self.title}, Note: {all_notes}, Tag: {self.tag}'
+
 
 class NoteBook(UserDict):
 
@@ -43,6 +56,12 @@ class NoteBook(UserDict):
 
     def delete_record(self, record):
         del self.data[record.title]
+
+    def iterator(self):
+        record_list = ''
+        for record in self.data.values():
+            record_list += str(record) + '\n'
+        return record_list
 
 
 file_name = 'NoteBook.bin'
@@ -99,7 +118,17 @@ def edit_note(notebook):
                 write_file(notebook)
                 return f"Текст нотатка успішно змінений"
     else:
-        return f"No note with a title '{input_title}' was found"
+        return f"Нотатка з назвою'{input_title}' не знайдено"
+
+
+def show_all_note(notebook):
+    if not notebook:
+        return 'Немає жодного запису'
+    record_list = notebook.iterator()
+    to_show = ''
+    for record in record_list:
+        to_show += f'{record}'
+    return to_show
 
 
 def delete_note(notebook):
@@ -120,7 +149,7 @@ def exit(notebook):
 
 
 def unknown_command(*args):
-    return 'Unknown command! Enter again!'
+    return 'Я не знаю такої команди, спробуйте ще раз!'
 
 
 def help(*args):
@@ -130,6 +159,7 @@ def help(*args):
     "help" Список доступних команд
     "add note" Створює новий нотаток (назва, текст, тег)
     "edit note" Замінює текст нотатка
+    "show all note" Виводить в консоль всі записи
     "delete note" Видаляє нотаток за назвою
     "exit" Вихід з застосунка
     """
@@ -139,6 +169,7 @@ COMMANDS = {
     help: ['help'],
     add_note: ['add note'],
     edit_note: ['edit note'],
+    show_all_note: ['show all note'],
     delete_note: ['delete note'],
     exit: ['exit']
 }
