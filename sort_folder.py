@@ -32,6 +32,9 @@ def normalize(name: str) -> str:
     return name
 
 def sort_folder(folder_path: str):
+    if not os.path.exists(folder_path):
+        # print("Folder does not exist.")
+        return False
     folder = Path(folder_path)
     for item in folder.iterdir():
         if item.is_dir() and item.name not in CATEGORIES:
@@ -66,6 +69,7 @@ def sort_folder(folder_path: str):
                 unknown_folder.mkdir(parents=True, exist_ok=True)
                 target_path = unknown_folder / target_name
                 item.rename(target_path)
+    return True
 
 def main():
     if len(sys.argv) != 2:
