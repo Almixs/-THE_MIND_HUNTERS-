@@ -33,7 +33,14 @@ class Note(Field):
 
 
 class Tag(Field):
-    pass
+    def __eq__(self, other):
+        return self.value == other.value
+    
+    def __lt__(self, other):
+        return self.value < other.value
+    
+    def __gt__(self, other):
+        return self.value > other.value
 
 
 class Record:
@@ -47,17 +54,10 @@ class Record:
 
         return f'Title: {self.title}, Note: {self.note}, Tag: {self.tag}'
 
-    def __str__(self) -> str:
-
-        all_notes = [x['note'] for x in self.note]
-        return f'Title: {self.title}, Note: {all_notes}, Tag: {self.tag}'
-
 
 class NoteBook(UserDict):
 
     def add_record(self, record):
-
-        if isinstance(record, Record):
             self.data[record.title.value] = record
 
     def remove_record(self, title):
@@ -68,18 +68,13 @@ class NoteBook(UserDict):
     def add_tag_to_record(self, title, new_tag):
         if title in self.data:
             record = self.data[title]
-            record.tag.append(new_tag)
+            if isinstance(new_tag, Tag):
+                record.tag.append(new_tag)
+            else:
+                raise ValueError("new_tag должен быть объектом класса Tag")
+        else:
+            raise KeyError(f"Запись с ключом '{title}' не найдена в записной книжке")
 
-    # def remove_tag_from_records(self, tag_to_remove):
-    #     for record in self.data.values():
-    #         if tag_to_remove in record.tag:
-    #             record.tag.remove(tag_to_remove)
-
-    def iterator(self):
-        record_list = ''
-        for record in self.data.values():
-            record_list += str(record) + '\n'
-        return record_list
 
     def iterator(self):
         record_list = ''
@@ -125,7 +120,7 @@ def add_note(notebook):
     input_record = Record(Title(input_title), Note(input_note), Tag(input_tag))
     notebook.add_record(input_record)
     write_file(notebook)
-    return f'Нотаток усппішно створено'
+    return f'Нотаток успішно створено'
 
 
 def edit_note(notebook):
@@ -142,29 +137,7 @@ def edit_note(notebook):
                 return f"Текст нотатка успішно змінений"
     else:
         return f"Нотатка з назвою'{input_title}' не знайдено"
-<<<<<<< HEAD
     
-def add_tag(notebook):
-    titles_list = list(map(str, (notebook.keys())))
-    print(f"Виберіть назву нотатка, в який треба додати тег:\n{titles_list}")
-    input_title = input()
-    for k, v in notebook.items():
-        print(k, v)
-    if input_title in titles_list:
-        print('Введіть новий тег: ')
-        new_tag = Tag(input())
-        notebook.add_tag_to_record(input_title, new_tag)
-        write_file(notebook)
-        return f"Тег'{new_tag}' був додан"
-    else:
-        return f"Нотаток з назвою'{input_title}' нажаль не знайдено"
-    
-# def del_tag(notebook):
-#     print('Введіть тег, який треба видалити:')
-#     tag_to_remove = Tag(input())
-#     notebook.remove_tag_from_records(tag_to_remove)
-
-
 def search_note_by_text(notebook):
     print('Введіть фрагмент текста який будемо шукати: ')
     search_text = input()
@@ -196,9 +169,6 @@ def sort_note_by_tag(notebook):
         print ('Ось що вийшло: ')
         
         return '\n'.join(map(str,  sort_record))
-=======
->>>>>>> 1899eae200a21be7de3961c6d7b15f6812baec0e
-
 
 def show_all_note(notebook):
     if not notebook:
@@ -239,14 +209,10 @@ def help(*args):
     "add note" Створює новий нотаток (назва, текст, тег)
     "edit note" Замінює текст нотатка
     "show all note" Виводить в консоль всі записи
-<<<<<<< HEAD
     "search by text" Шукає нотатки за текстом
     "search by tag" Шукає нотатки за тегом
-    "add tag" Додає новий туг до нотатка
-    "del tag" Видаляє вказаний тег
+    "add tag" Додає новий до нотатка
     "sort by tag" Сортує нотатки за тегом
-=======
->>>>>>> 1899eae200a21be7de3961c6d7b15f6812baec0e
     "delete note" Видаляє нотаток за назвою
     "exit" Вихід з застосунка
     """
@@ -255,16 +221,11 @@ def help(*args):
 COMMANDS = {
     help: ['help'],
     add_note: ['add note'],
-    add_tag: ['add tag'],
-    # del_tag: ['del tag'],
     edit_note: ['edit note'],
     show_all_note: ['show all note'],
-<<<<<<< HEAD
     search_note_by_text: ['search by text'],
     search_note_by_tag: ['search by tag'],
     sort_note_by_tag: ['sort by tag'],
-=======
->>>>>>> 1899eae200a21be7de3961c6d7b15f6812baec0e
     delete_note: ['delete note'],
     exit: ['exit']
 }
