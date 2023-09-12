@@ -47,6 +47,11 @@ class Record:
 
         return f'Title: {self.title}, Note: {self.note}, Tag: {self.tag}'
 
+    def __str__(self) -> str:
+
+        all_notes = [x['note'] for x in self.note]
+        return f'Title: {self.title}, Note: {all_notes}, Tag: {self.tag}'
+
 
 class NoteBook(UserDict):
 
@@ -69,6 +74,12 @@ class NoteBook(UserDict):
     #     for record in self.data.values():
     #         if tag_to_remove in record.tag:
     #             record.tag.remove(tag_to_remove)
+
+    def iterator(self):
+        record_list = ''
+        for record in self.data.values():
+            record_list += str(record) + '\n'
+        return record_list
 
     def iterator(self):
         record_list = ''
@@ -131,6 +142,7 @@ def edit_note(notebook):
                 return f"Текст нотатка успішно змінений"
     else:
         return f"Нотатка з назвою'{input_title}' не знайдено"
+<<<<<<< HEAD
     
 def add_tag(notebook):
     titles_list = list(map(str, (notebook.keys())))
@@ -184,6 +196,8 @@ def sort_note_by_tag(notebook):
         print ('Ось що вийшло: ')
         
         return '\n'.join(map(str,  sort_record))
+=======
+>>>>>>> 1899eae200a21be7de3961c6d7b15f6812baec0e
 
 
 def show_all_note(notebook):
@@ -225,11 +239,14 @@ def help(*args):
     "add note" Створює новий нотаток (назва, текст, тег)
     "edit note" Замінює текст нотатка
     "show all note" Виводить в консоль всі записи
+<<<<<<< HEAD
     "search by text" Шукає нотатки за текстом
     "search by tag" Шукає нотатки за тегом
     "add tag" Додає новий туг до нотатка
     "del tag" Видаляє вказаний тег
     "sort by tag" Сортує нотатки за тегом
+=======
+>>>>>>> 1899eae200a21be7de3961c6d7b15f6812baec0e
     "delete note" Видаляє нотаток за назвою
     "exit" Вихід з застосунка
     """
@@ -242,9 +259,12 @@ COMMANDS = {
     # del_tag: ['del tag'],
     edit_note: ['edit note'],
     show_all_note: ['show all note'],
+<<<<<<< HEAD
     search_note_by_text: ['search by text'],
     search_note_by_tag: ['search by tag'],
     sort_note_by_tag: ['sort by tag'],
+=======
+>>>>>>> 1899eae200a21be7de3961c6d7b15f6812baec0e
     delete_note: ['delete note'],
     exit: ['exit']
 }
