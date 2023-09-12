@@ -63,8 +63,7 @@ def print_list_contacts(contacts: ab.Record):
             phones.append("")
         if len(emails) == 0:
             emails.append("")
-        else:
-            print(
+        print(
             f'|{i:^5}|{val.name.value:^20}|{phones[0]:^20}|{emails[0]:^30}|{str(val.birthday.value):^20}|{val.address.value:^20}|')
 
         if max(len(phones), len(emails)) > 1:
