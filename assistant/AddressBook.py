@@ -318,3 +318,6 @@ class AddressBook(UserDict):
             return False
         # print(dict)
         return dict
+    
+    def remove_record(self, name: str):
+        del self.data[name]
