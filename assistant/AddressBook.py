@@ -6,6 +6,7 @@ import os
 
 filepath = os.path.expanduser("~\Documents")
 
+
 class Field:
     def __init__(self, value):
         self._value = None
@@ -68,6 +69,9 @@ class Birthday(Field):
 
         if birthday_data <= datetime.now():
             self._value = birthday_data.date()
+        else:
+            # 'Date of birthday in the future
+            raise ValueError
 
 
 class Record:
@@ -77,7 +81,6 @@ class Record:
         self.birthday = None
         self.emails = []
         self.address = None
-
 
     def add_name(self, name: str):
         if name:
@@ -141,8 +144,9 @@ class Record:
                 print(f"{self.birthday.value} was successfully added")
                 return True
             except ValueError:
-                print(f"Wrong format of {birthday}. Example: yyyy-mm-dd.")
+                print(f"Wrong format of {birthday} (Example: yyyy-mm-dd) or Date of birthday in the future")
                 return False
+
         else:
             print("No birthday was given.")
             return False
@@ -318,6 +322,6 @@ class AddressBook(UserDict):
             return False
         # print(dict)
         return dict
-    
+
     def remove_record(self, name: str):
         del self.data[name]
