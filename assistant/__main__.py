@@ -10,10 +10,8 @@ MAIN_MENU = {"title": "Main menu", '1': 'Address book', '2': 'Note book', '3': '
 
 ADDRESS_BOOK_MENU = {'title': "Address book menu", 'show all': 'Show all contacts in Book', 'add': 'Add contact to Book',
                      'find': 'Find person in Book', "show bd": "Show persons with birthday", 'edit': 'Edit personal info',
-                     'del': 'Delete personal info', 'return': 'Return to main menu'}
+                     'del': 'Delete personal info', 'remove': 'Remove person from Book', 'return': 'Return to main menu'}
 
-# NOTE_BOOK_MENU = {'title': "Note book menu", "create": "Create new note", "find": "Find notes", "edit": "Edit notes",
-#                   "del": "Delete note", 'return': 'Return to main menu'}
 
 class MainMenu:
     def __init__(self, table: dict):
@@ -95,36 +93,35 @@ def run_address_book():
                     address_menu = MenuBook(ADDRESS_BOOK_MENU)
                     address_menu.print_table()
                     break
-                if name_edit not in address_book:
+                elif name_edit not in address_book:
                     print("Input name not in Address Book. Try again or input 'exit' to return to Address book menu")
                 else:
+                    while True:
+                        field_edit = input("Input field you want to edit (phone, email, birthday, address): ")
+                        if field_edit not in ('phone', 'email', 'birthday', 'address'):
+                            print("Incorrect field")
+
+                        else:
+                            break
+                    if field_edit == 'phone':
+                        old_phone = input("Input old phone: ")
+                        new_phone = input("Input new phone: ")
+                        address_book[name_edit].change_phone(old_phone, new_phone)
+
+                    elif field_edit == 'email':
+                        old_email = input("Input old email: ")
+                        new_email = input("Input new email: ")
+                        address_book[name_edit].change_email(old_email, new_email)
+
+                    elif field_edit == 'birthday':
+                        new_birthday = input("Input birthday: ")
+                        address_book[name_edit].change_birthday(new_birthday)
+
+                    elif field_edit == 'address':
+                        new_address = input("Input address: ")
+                        address_book[name_edit].change_address(new_address)
+                    address_book.save_adress_book_to_file()
                     break
-
-            while True:
-                field_edit = input("Input field you want to edit (phone, email, birthday, address): ")
-                if field_edit not in ('phone', 'email', 'birthday', 'address'):
-                    print("Incorrect field")
-                    continue
-                else:
-                    break
-            if field_edit == 'phone':
-                old_phone = input("Input old phone: ")
-                new_phone = input("Input new phone: ")
-                address_book[name_edit].change_phone(old_phone, new_phone)
-
-            elif field_edit == 'email':
-                old_email = input("Input old email: ")
-                new_email = input("Input new email: ")
-                address_book[name_edit].change_email(old_email, new_email)
-
-            elif field_edit == 'birthday':
-                new_birthday = input("Input birthday: ")
-                address_book[name_edit].change_birthday(new_birthday)
-
-            elif field_edit == 'address':
-                new_address = input("Input address: ")
-                address_book[name_edit].change_address(new_address)
-            address_book.save_adress_book_to_file()
         elif input_command == "return":
             # run_main_menu()
             # возвращ. в головне меню
@@ -209,7 +206,7 @@ def run_address_book():
                 print("<< No results >>")
         elif input_command == "del":
             while True:
-                name_edit = input("Input name to del info: ")
+                name_edit = input("Input name to del info or exit: ")
                 if name_edit == "exit":
                     address_menu = MenuBook(ADDRESS_BOOK_MENU)
                     address_menu.print_table()
@@ -217,26 +214,50 @@ def run_address_book():
                 if name_edit not in address_book:
                     print("Input name not in Address Book. Try again or input 'exit' to return to Address book menu")
                 else:
+                    while True:
+                        field_del = input("Input field you want to delete (phone, email, birthday, address): ")
+                        if field_del not in ('phone', 'email', 'birthday', 'address'):
+                            print("<Incorrect field!!!>")
+                            continue
+                        else:
+                            break
+                    if field_del == 'phone':
+                        phone_del = input("Input phone you want to delete: ")
+                        address_book[name_edit].remove_phone(phone_del)
+                    elif field_del == 'email':
+                        email_del = input("Input email you want to delete: ")
+                        address_book[name_edit].remove_email(email_del)
+                    elif field_del == 'birthday':
+                        address_book[name_edit].remove_birthday()
+                    elif field_del == 'address':
+                        address_book[name_edit].remove_address()
+                    address_book.save_adress_book_to_file()
                     break
 
+        elif input_command == "remove":
             while True:
-                field_del = input("Input field you want to delete (phone, email, birthday, address): ")
-                if field_del not in ('phone', 'email', 'birthday', 'address'):
-                    print("<Incorrect field!!!>")
-                    continue
-                else:
+                name_remove = input("Input name to remove from Book: ")
+                if name_remove == "exit":
+                    address_menu = MenuBook(ADDRESS_BOOK_MENU)
+                    address_menu.print_table()
                     break
-            if field_del == 'phone':
-                phone_del = input("Input phone you want to delete: ")
-                address_book[name_edit].remove_phone(phone_del)
-            elif field_del == 'email':
-                email_del = input("Input email you want to delete: ")
-                address_book[name_edit].remove_email(email_del)
-            elif field_del == 'birthday':
-                address_book[name_edit].remove_birthday()
-            elif field_del == 'address':
-                address_book[name_edit].remove_address()
-            address_book.save_adress_book_to_file()
+                if name_remove not in address_book:
+                    print("Input name not in Address Book. Try again or input 'exit' to return to Address book menu")
+                else:
+
+                    while True:
+                        confirmation = input("Are you sure?(yes/no): ")
+                        if confirmation == "yes":
+                            address_book.remove_record(name_remove)
+                            address_book.save_adress_book_to_file()
+                            print(f"<< {name_remove} was removed from Book >>")
+                            break
+                        elif confirmation == "no":
+                            break
+                        else:
+                            print("Input 'yes' or 'no'")
+                            continue
+                    break
 
 def run_note_book():
     nb.main()
