@@ -4,7 +4,7 @@ import re
 import pickle
 import os
 
-
+filepath = os.path.expanduser("~\Documents")
 
 class Field:
     def __init__(self, value):
@@ -19,13 +19,15 @@ class Field:
     def value(self, value):
         self._value = value
 
+
 class Name(Field):
     @Field.value.setter
     def value(self, value):
         if re.search(r"[а-яa-zА-ЯA-Z']{2,}[\w-]+", value):
             self._value = value.title()
-        else: 
+        else:
             raise ValueError('Wrong name. Please enter correct name')
+
 
 class Address(Field):
     @Field.value.setter
@@ -37,6 +39,7 @@ class Address(Field):
         else:
             raise ValueError('Wrong address.')
 
+
 class Phone(Field):
     @Field.value.setter
     def value(self, new_value: str):
@@ -45,6 +48,7 @@ class Phone(Field):
         else:
             raise ValueError('Wrong format of phone.')
 
+
 class Email(Field):
     @Field.value.setter
     def value(self, new_value: str):
@@ -52,6 +56,7 @@ class Email(Field):
             self._value = new_value
         else:
             raise ValueError(f'Email: {new_value} wrong format.\n')
+
 
 class Birthday(Field):
     @Field.value.setter
@@ -65,8 +70,6 @@ class Birthday(Field):
             self._value = birthday_data.date()
 
 
-
-
 class Record:
     def __init__(self):
         self.name = None
@@ -75,7 +78,8 @@ class Record:
         self.emails = []
         self.address = None
 
-    def add_name(self,name: str):
+
+    def add_name(self, name: str):
         if name:
             self.name = Name(name)
             print(f"{self.name.value} was successfully added")
@@ -94,8 +98,8 @@ class Record:
                 print("Wrong format of adress. Example: \"City,street number\"")
                 return False
         else:
-            print(f'No address was given.')
-            return False
+            # print(f'No address was given.')
+            return f'No address was given.'
 
     def add_phone(self, phone: str):
         try:
@@ -108,7 +112,7 @@ class Record:
             if phone.value == phone_sub.value:
                 print(f"{phone.value} already exists.")
                 return False
-            
+
         print(f'{phone.value} successfully added')
         self.phones.append(phone)
         return True
@@ -120,7 +124,7 @@ class Record:
             except ValueError:
                 print(f"Wrong format of \'{email}\'. Example: \"xxxx@xxxx.xxxx or xxxx.xxxx@xxxx.xxxx\"")
                 return False
-            
+
         for email_sub in self.emails:
             if email.value == email_sub.value:
                 print(f'\'{email.value}\' already exists.')
@@ -129,7 +133,7 @@ class Record:
         print(f'{email.value} successfully added')
         self.emails.append(email)
         return True
-    
+
     def add_birthday(self, birthday: str):
         if not self.birthday:
             try:
@@ -142,7 +146,7 @@ class Record:
         else:
             print("No birthday was given.")
             return False
-        
+
     def change_name(self, new_name: str):
         if new_name:
             self.name = Name(new_name)
@@ -151,7 +155,7 @@ class Record:
         else:
             print("No name was given.")
             return False
-    
+
     def change_address(self, new_address: str):
         if new_address:
             try:
@@ -178,7 +182,7 @@ class Record:
 
     def change_phone(self, old_phone: str, new_phone: str):
         flag_1 = False
-        for index, phone in enumerate(self.phones,start=0):
+        for index, phone in enumerate(self.phones, start=0):
             if old_phone == phone.value:
                 flag_1 = True
                 flag_2 = False
@@ -194,16 +198,17 @@ class Record:
                         print(f'{phone.value} successfully changed to {new_phone}')
                         return True
                     except ValueError:
-                        print(f'{new_phone} - Wrong format of phone. Please enter correct phone number. Example: +xxx xx xxx-xx-xx')
+                        print(
+                            f'{new_phone} - Wrong format of phone. Please enter correct phone number. Example: +xxx xx xxx-xx-xx')
                         return False
-            
+
         if flag_1 == False:
             print("There is no phone that you wrote to change.")
             return False
-            
+
     def change_email(self, old_email: str, new_email: str):
         flag_1 = False
-        for index, email in enumerate(self.emails,start=0):
+        for index, email in enumerate(self.emails, start=0):
             if old_email == email.value:
                 flag_1 = True
                 flag_2 = False
@@ -221,7 +226,7 @@ class Record:
                     except ValueError:
                         print(f"Wrong format of \'{new_email}\'. Example: \"xxxx@xxxx.xxxx or xxxx.xxxx@xxxx.xxxx\"")
                         return False
-            
+
         if flag_1 == False:
             print("There is no email that you wrote to change.")
             return False
@@ -229,14 +234,14 @@ class Record:
     def remove_address(self):
         if self.address:
             print(f'Address {self.address.value} was deleted')
-            self.address = None
+            self.address._value = ""
             return True
         return False
 
     def remove_birthday(self):
         if self.birthday:
             print(f'Birthday {self.birthday.value} was deleted')
-            self.birthday = None
+            self.birthday._value = ""
             return True
         return False
 
@@ -253,23 +258,23 @@ class Record:
         for email in self.emails:
             if email.value == email_to_remove:
                 self.emails.remove(email)
-                print(f'Email {email_to_remove} was deleted\n')
+                print(f'Email {email_to_remove} was deleted')
                 return True
-            
+
         print(f'There is no such email')
         return False
 
 
 class AddressBook(UserDict):
-    filepath = os.path.expanduser("~\Documents")
+    # filepath = os.path.expanduser("~\Documents")
 
     def add_record(self, record: Record) -> None:
         self.data[record.name.value] = record
         self.save_adress_book_to_file()
-    
+
     def save_adress_book_to_file(self, filename=f"{filepath}\AddressBook.bin"):
         with open(filename, "wb") as fh:
-            pickle.dump(self.data, fh) 
+            pickle.dump(self.data, fh)
 
     @classmethod
     def read_adress_book_from_file(cls, filename=f"{filepath}\AddressBook.bin"):
@@ -279,40 +284,37 @@ class AddressBook(UserDict):
                 return cls(load_dict)
         except FileNotFoundError:
             return cls()
-            
-    def show_list_birthday(self,number):
+
+    def show_list_birthday(self, number):
 
         dict_with_name_and_birthday = {}
-        
+
         c_d = datetime.now()
 
-        days = timedelta(days = number)
+        days = timedelta(days=number)
         for person in self.data:
             try:
-                birthday_data_str = self.data[person].birthday.value.strftime("%Y-%m-%d") #type: str
-                user_date_of_birth = datetime.strptime(birthday_data_str, '%Y-%m-%d').date() #type: datetime
+                birthday_data_str = self.data[person].birthday.value.strftime("%Y-%m-%d")  # type: str
+                user_date_of_birth = datetime.strptime(birthday_data_str, '%Y-%m-%d').date()  # type: datetime
                 main_date = c_d.date() + days
                 if main_date.day == user_date_of_birth.day and main_date.month == user_date_of_birth.month:
                     dict_with_name_and_birthday[person] = birthday_data_str
             except AttributeError:
                 pass
-            
 
         return dict_with_name_and_birthday
-    
+
     def find_person(self, name: str):
         if name == "":
             print("You typed empty.")
             return False
-        
+
         dict = {}
         for person in self.data:
             if name in person:
                 dict[person] = self.data[person]
         if len(dict) == 0:
-            print("There is no such contact that you are looking for.")
+            # print("There is no such contact that you are looking for.")
             return False
-        print(dict)
-        return True
-        
-
+        # print(dict)
+        return dict
