@@ -148,7 +148,8 @@ def add_tag(notebook):
         return f"Тег'{new_tag}' був додан"
     
 def delete_tag_from_note(notebook):
-    print("Введіть назву нотатка, з якого потрібно видалити тег:")
+    titles_list = list(map(str, (notebook.keys())))
+    print(f"Виберіть назву нотатка, з якого треба видалити тег:\n{titles_list}")
     input_title = input()
     if input_title in notebook:
         note = notebook[input_title]
