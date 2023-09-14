@@ -49,7 +49,8 @@ This is a simple console-based assistant bot prototype that can manage contacts.
    - `show bd`: Show persons with birthday.
    - `edit`: Edit personal info.
    - `del`: Delete personal info.
-   - `return`: Return to main menu .
+   - `remove`: Remove person from Book.
+   - `return`: Return to main menu.
 
 
 # -Note Book-
