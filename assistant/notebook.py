@@ -1,8 +1,11 @@
 from collections import UserDict
 import os
 import pickle
+from prettytable import PrettyTable
 
-
+# код визначає клас під назвою Field який інкапсулює значення,
+# і надає методи для отримання та встановлення цього значення. 
+# Клас також забезпечує рядкове представлення значення.
 class Field:
 
     def __init__(self, value):
@@ -42,7 +45,8 @@ class Tag(Field):
     def __gt__(self, other):
         return self.value > other.value
 
-
+# код визначає клас, який представляє запис із заголовком, приміткою та тегом. 
+# Метод __str__ дозволяє легко друкувати об’єкт запису.
 class Record:
 
     def __init__(self, title, note, tag):
@@ -54,17 +58,17 @@ class Record:
 
         return f'Title: {self.title}, Note: {self.note}, Tag: {self.tag}'
 
-
+#Цей код визначає клас NoteBook, який успадковує клас UserDict.
 class NoteBook(UserDict):
-
+    #Метод add_record приймає параметр запису та додає його до атрибута data об’єкта NoteBook
     def add_record(self, record):
             self.data[record.title.value] = record
-
+    # Метод remove_record приймає параметр title і видаляє запис із цим заголовком зі словника даних, якщо він існує.
     def remove_record(self, title):
 
         if title in self.data:
             del self.data[title]
-
+    # Метод add_tag_to_record приймає параметр title і new_tag та додає new_tag до атрибута тегу запису
     def add_tag_to_record(self, title, new_tag):
         if title in self.data:
             record = self.data[title]
@@ -74,13 +78,6 @@ class NoteBook(UserDict):
                 raise ValueError("new_tag должен быть объектом класса Tag")
         else:
             raise KeyError(f"Запись с ключом '{title}' не найдена в записной книжке")
-
-
-    def iterator(self):
-        record_list = ''
-        for record in self.data.values():
-            record_list += str(record) + '\n'
-        return record_list
 
 
 file_name = 'NoteBook.bin'
@@ -138,15 +135,55 @@ def edit_note(notebook):
     else:
         return f"Нотатка з назвою'{input_title}' не знайдено"
     
+def add_tag(notebook):
+    titles_list = list(map(str, (notebook.keys())))
+    print(f"Виберіть назву нотатка, в який треба додати тег:\n{titles_list}")
+    input_title = input()
+
+    if input_title in titles_list:
+        print('Введіть новий тег: ')
+        new_tag = Tag(input())
+        notebook.add_tag_to_record(input_title, new_tag)
+        write_file(notebook)
+        return f"Тег'{new_tag}' був додан"
+    
+def delete_tag_from_note(notebook):
+    print("Введіть назву нотатка, з якого потрібно видалити тег:")
+    input_title = input()
+    if input_title in notebook:
+        note = notebook[input_title]
+        if note.tag:
+            print("Введіть тег, який потрібно видалити:")
+            input_tag = input()
+            for tag in note.tag:
+                if tag.value == input_tag:
+                    note.tag.remove(tag)
+                    write_file(notebook)
+                    return f"Тег '{input_tag}' видалено з нотатка '{input_title}'"
+            return f"Тег '{input_tag}' не знайдено в нотатку '{input_title}'"
+        else:
+            return f"Нотаток '{input_title}' не має тегів"
+    else:
+        return f"Нотаток з назвою '{input_title}' не знайдено"
+    
+
 def search_note_by_text(notebook):
     print('Введіть фрагмент текста який будемо шукати: ')
     search_text = input()
     found_records = []
+
+    table = PrettyTable()
+    table.field_names = ["Title", "Note", "Tags"]
+
     for record in notebook.values():
-            if search_text in str(record.title) or search_text in str(record.note):
-                found_records.append(str(record))
-    if found_records: 
-        return f'Текст {search_text}, був знайден в наступних нотатках {[*found_records]}'
+        if search_text in str(record.title) or search_text in str(record.note):
+            found_records.append(record)
+    
+    if found_records:
+        for record in found_records:
+            print(f'Текст {search_text}, був знайден в наступних нотатках:')
+            table.add_row([record.title.value, record.note.value, ", ".join(tag.value for tag in record.tag)])
+        return str(table)
     else:
         return f'Нажаль нічого не знайдено'
     
@@ -154,30 +191,49 @@ def search_note_by_tag(notebook):
     print('Введіть тег за яким будемо шукати: ')
     search_tag = input()
     found_records = []
+    table = PrettyTable()
+    table.field_names = ["Title", "Note", "Tags"]
     for record in notebook.values():
             if search_tag in str(record.tag):
-                found_records.append(str(record))
-    if found_records: 
-        return f'Тег {search_tag}, був знайден в наступних нотатках {[*found_records]}'
+                found_records.append(record)
+    if found_records:
+        print(f'Тег {search_tag}, був знайден в наступних нотатках:') 
+        for record in found_records:
+            table.add_row([record.title.value, record.note.value, ", ".join(tag.value for tag in record.tag)])
+            return str(table)
+        
     else:
         return f'Нажаль нічого не знайдено'
     
+
+
 def sort_note_by_tag(notebook):
-        
-        sort_record = list(notebook.values())
-        sort_record.sort(key=lambda note: note.tag)
-        print ('Ось що вийшло: ')
-        
-        return '\n'.join(map(str,  sort_record))
+    sorted_records = list(notebook.values())
+    sorted_records.sort(key=lambda note: [tag.value for tag in note.tag])
+
+    if not sorted_records:
+        return 'Немає жодних записів'
+
+    table = PrettyTable()
+    table.field_names = ["Title", "Note", "Tags"]
+
+    for record in sorted_records:
+        table.add_row([record.title.value, record.note.value, ", ".join(tag.value for tag in record.tag)])
+
+    return str(table)
 
 def show_all_note(notebook):
+
     if not notebook:
         return 'Немає жодного запису'
-    record_list = notebook.iterator()
-    to_show = ''
-    for record in record_list:
-        to_show += f'{record}'
-    return to_show
+    
+    table = PrettyTable()
+    table.field_names = ["Title", "Note", "Tags"]
+
+    for record in notebook.values():
+        table.add_row([record.title.value, record.note.value, ", ".join(tag.value for tag in record.tag)])
+
+    return str(table)
 
 
 def delete_note(notebook):
@@ -202,24 +258,41 @@ def unknown_command(*args):
 
 
 def help(*args):
-    return """
-    Список доступних команд:
-
-    "help" Список доступних команд
-    "add note" Створює новий нотаток (назва, текст, тег)
-    "edit note" Замінює текст нотатка
-    "show all note" Виводить в консоль всі записи
-    "search by text" Шукає нотатки за текстом
-    "search by tag" Шукає нотатки за тегом
-    "sort by tag" Сортує нотатки за тегом
-    "delete note" Видаляє нотаток за назвою
-    "exit" Вихід з застосунка
+    return r"""
+    Вас вітає розумний записник!
+    +---------------------------------------------------------+
+    |               Список доступних команд:                  |
+    +---------------------------------------------------------+
+    |"help" Список доступних команд                           |
+    +---------------------------------------------------------+
+    |"add note" Створює новий нотаток (назва, текст, тег)     |
+    +---------------------------------------------------------+
+    |"add tag" Додає новий тег до нотатка                     |
+    +---------------------------------------------------------+                  
+    |"delete tag" Видаляє вказаний тег з нотатка              |
+    +---------------------------------------------------------+
+    |"edit note" Замінює текст нотатка                        |
+    +---------------------------------------------------------+
+    |"show all note" Виводить в консоль всі записи            |
+    +---------------------------------------------------------+
+    |"search by text" Шукає нотатки за текстом                |
+    +---------------------------------------------------------+
+    |"search by tag" Шукає нотатки за тегом                   |
+    +---------------------------------------------------------+
+    |"sort by tag" Сортує нотатки за тегом                    |
+    +---------------------------------------------------------+
+    |"delete note" Видаляє нотаток за назвою                  |
+    +---------------------------------------------------------+
+    |"exit" Вихід з застосунка                                |
+    +---------------------------------------------------------+
     """
 
 
 COMMANDS = {
     help: ['help'],
     add_note: ['add note'],
+    add_tag: ['add tag'],
+    delete_tag_from_note: ['delete tag'],
     edit_note: ['edit note'],
     show_all_note: ['show all note'],
     search_note_by_text: ['search by text'],
@@ -242,7 +315,6 @@ def command_parser(user_command: str) -> (str, list):
 
 def main():
     notebook = read_file()
-    print(notebook)
     print(help())
     while True:
         user_command = input("Введіть команду: ")
