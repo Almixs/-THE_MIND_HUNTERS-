@@ -61,13 +61,16 @@ This is a simple console prototype of a helper bot that can manage notes. It rec
 1. The bot will be waiting for your commands.
 2. Available commands:
 
-   - `show all`: Show all contacts in Book.
-   - `add`: Add contact to Book.
-   - `find`: Find person in Book.
-   - `show bd`: Show persons with birthday.
-   - `edit`: Edit personal info.
-   - `del`: Delete personal info .
-   - `return`: Return to main menu .
+   - `help`: List of available commands.
+   - `add note`: Creates a new note (name, text, tag).
+   - `add tag`: Adds a new tag to the note.
+   - `delete tag`: Deletes the specified tag from the note.
+   - `edit note`: Replaces the note text.
+   - `show all note`: Displays all records in the console.
+   - `search by text`: Searches for notes by text.
+   - `search by tag`: Searches for notes by text.
+   - `delete note`: Deletes a note by name.
+   - `exit`: Exit the application.
 
 # -Sort Folder-
 

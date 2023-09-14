@@ -31,7 +31,7 @@ def normalize(name: str) -> str:
     name = '_'.join(name.split())  # Заміна пробілів на підкреслення
     return name
 
-def sort_folder(folder_path: str):
+def sort_folder(folder_path: str) -> None:
     folder = Path(folder_path)
     for item in folder.iterdir():
         if item.is_dir() and item.name not in CATEGORIES:
