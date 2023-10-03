@@ -84,7 +84,7 @@ file_name = 'NoteBook.bin'
 file_path = os.path.expanduser("~\Documents")
 
 
-def write_file(self, file_name=rf"{file_path}\NoteBook.bin"):
+def write_file(self, file_name=("NoteBook.bin")):
     with open(file_name, "wb") as file:
         pickle.dump(self, file)
 
